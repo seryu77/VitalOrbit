@@ -9,3 +9,5 @@ dist/
 public/mediapipe/
 server/*.db
 server/*.db-*
+CLAUDE.md
+graphify-out/
