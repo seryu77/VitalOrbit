@@ -146,6 +146,7 @@ vitalorbit/
 ## Documentation
 
 - [Features](docs/FEATURES.md)
+- [Feature ideas and roadmap](docs/FEATURE-IDEAS.md)
 - [Product requirements](docs/PRD.md)
 - [System design](docs/system-design.md)
 - [Architecture](docs/architecture.md)
