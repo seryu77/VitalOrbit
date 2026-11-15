@@ -11,7 +11,7 @@ VitalOrbit is a health monitoring tool that helps astronauts assess their own he
 | **Event** | 2026 NASA Space Apps Challenge |
 | **Challenge** | [Create Health Monitoring Software for Astronauts on Space Missions](https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/) |
 | **Team** | Semangat Kuliah |
-| **Team members** | Faiz (Back-End Developer), Caka (Product), Al Fachrezi (Front-End Developer), Rafiandhi (AI Engineer) |
+| **Team members** | Faiz (Tech Lead), Caka (Product Manager), Al Fachrezi (Software Engineer), Rafiandhi (Solution Architect) |
 | **Live demo** | TBD |
 | **Project demo (slides or video)** | TBD |
 
