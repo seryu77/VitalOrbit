@@ -70,6 +70,8 @@ These values are **for demonstration only**. They are based on general adult ref
 | SpO2 (%) | 95 or higher | 90 to 94 | Below 90 |
 | Body temperature (°C) | 36.1 to 37.5 | 37.6 to 38.4, or 35.0 to 36.0 | 38.5 or higher, or below 35.0 |
 | Systolic blood pressure (mmHg) | 90 to 129 | 130 to 179, or 80 to 89 | 180 or higher, or below 80 |
+| Fasting blood glucose (mg/dL) | 70 to 99 | 54 to 69, or 100 to 125 | Below 54, or above 125 |
+| Body mass (change from mission baseline) | Within 5% | 5% to 10% | More than 10% |
 | Sleep (hours per night) | 7 or more | 6 to 6.9 | Below 6 |
 | Mood score (1 to 5) | 4 to 5 | 3 | 1 to 2 |
 | Radiation dose | Below the configured daily limit | Near the configured limit | Above the configured limit |
@@ -82,11 +84,10 @@ A single reading can be misleading, so the engine also checks patterns over time
 
 | Pattern | Result |
 |---|---|
-| Sleep below 6 hours for 3 nights in a row | Yellow, even if tonight is fine |
+| Sleep below 6 hours for 3 nights in a row | Red, with advice to contact the flight surgeon |
 | Mood score of 2 or lower for 3 days in a row | Red (behavioral health follow-up) |
-| Body mass down by more than 5% from the mission baseline | Yellow |
-| Resting heart rate rising for 5 days in a row | Yellow |
-| Two or more indicators red at the same time | Red with highest priority |
+| Resting heart rate rising for 5 days in a row | Yellow, even if today's value is in range |
+| Any indicator outside the green range for more than 3 days | Recommendation to contact the flight surgeon |
 
 ### 3.4 Hazard mapping
 

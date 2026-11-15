@@ -4,7 +4,7 @@
 
 VitalOrbit is a health monitoring tool that helps astronauts assess their own health during long space missions, understand what the numbers mean, and act on them with the limited resources available on board.
 
-> **Project status:** early prototype, built during the 2026 NASA Space Apps Challenge. This repository currently contains the project documentation and folder structure. The application code is in progress.
+> **Project status:** working prototype, built during the 2026 NASA Space Apps Challenge. All health readings are simulated.
 
 | | |
 |---|---|
@@ -44,7 +44,7 @@ VitalOrbit collects health indicators from several sources, turns them into a st
 - **Light gamification.** Points and streaks for exercise, sleep, and on-time measurements.
 - **Mission profiles.** Space station, Moon, Mars, or rover, with a matching communication delay.
 - **Offline first.** Data is stored on the device and synced to Earth when a link is available.
-- **Camera safety check (stretch goal).** On-device computer vision that raises an alert when a crew member is motionless or unresponsive for too long. No video is stored.
+- **Camera safety check (planned, not in the prototype).** On-device computer vision that raises an alert when a crew member is motionless or unresponsive for too long. No video is stored.
 
 ## Three users, one system
 
@@ -58,12 +58,12 @@ VitalOrbit collects health indicators from several sources, turns them into a st
 
 | In the prototype | Planned next |
 |---|---|
-| Astronaut dashboard: body map, indicator cards, trend charts | Microscope image analysis for blood cells and bacteria |
-| Simulated wearable, checkup, and radiation data | On-board sequencing for virus detection |
-| Status rules and guidance | Integration with real IoT devices |
-| Alerts and reminders | Calibration of the vision model for microgravity |
-| Simple crew and flight surgeon views | Sync that adapts to the communication delay |
-| Webcam vision demo (stretch goal) | |
+| Astronaut dashboard: body map, indicator cards, trend charts | Camera safety check with on-device computer vision |
+| Simulated wearable, checkup, and radiation data | Microscope image analysis for blood cells and bacteria |
+| Status rules, trend rules, and guidance | On-board sequencing for virus detection |
+| Alerts, reminders, mood check, points and streaks | Integration with real IoT devices |
+| Crew and flight surgeon views | Calibration of the vision model for microgravity |
+| Mission profiles and a simulated Earth link | Sync that adapts to the communication delay |
 
 ## Data and resources
 
@@ -87,8 +87,9 @@ VitalOrbit collects health indicators from several sources, turns them into a st
 
 | Resource | How it is used |
 |---|---|
-| [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) | On-device pose estimation for the camera safety check |
-| [PhysioNet](https://physionet.org/) | Reference for realistic wearable signal patterns |
+| [React](https://react.dev/), [Vite](https://vite.dev/), [TypeScript](https://www.typescriptlang.org/) | Application framework and build tools |
+| [Recharts](https://recharts.org/) | Trend charts |
+| [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) | Planned for the camera safety check. Not used in the prototype |
 
 ### About the data in this prototype
 
@@ -103,7 +104,8 @@ AI tools were used in this project, and we disclose that use here as required by
 | Area | Tool | How it was used |
 |---|---|---|
 | Documentation | Claude (Anthropic) | Drafting and structuring the documents in this repository |
-| Code | Claude (Anthropic) | Assisting with implementation. AI-assisted source files are marked with a header comment |
+| Code | Claude (Anthropic) | Writing the application code under the team's direction. Every AI-assisted source file is marked with a header comment, and the page metadata and footer state it as well |
+| Simulated data | Claude (Anthropic) | Writing the code that generates the simulated readings |
 
 The project idea and its direction come from the team. No AI-generated images, video, or audio are used at this time. If any are added, they will carry a visible watermark. This project does not use NASA logos, flags, or mission identifiers.
 
@@ -150,7 +152,33 @@ vitalorbit/
 
 ## Getting started
 
-Setup instructions will be added with the application code.
+Requirements: Node.js 18 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Open the address shown in the terminal (by default `http://localhost:5173`).
+
+Other commands:
+
+| Command | What it does |
+|---|---|
+| `npm run build` | Build the static site into `dist/` |
+| `npm run preview` | Serve the built site locally |
+| `npm run typecheck` | Check TypeScript types |
+| `npm run deploy` | Build and publish `dist/` to the `gh-pages` branch for GitHub Pages |
+
+## How to try the demo
+
+1. Use the **Demo scenario** buttons (Fever, Sleep debt, Cardiac event, Low mood, Solar storm) to simulate a health event for the astronaut.
+2. Watch the overall status, the body map, and the indicator cards change color.
+3. Select an indicator or a body part to see its trend, a plain explanation, and what to do now.
+4. Answer the **Mood check** to see how your own input changes the assessment.
+5. Switch to the **Crew** and **Flight surgeon** views to see who else is informed.
+6. Toggle **Earth link** to see how reports are queued on board when there is no connection.
+7. Change the **Mission** to see the communication delay and radiation limit change.
 
 ## License
 
