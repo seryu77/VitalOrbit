@@ -1,0 +1,16 @@
+body.glb
+
+Anatomical meshes from BodyParts3D, (c) The Database Center for Life Science (DBCLS),
+licensed under Creative Commons Attribution-ShareAlike 2.1 Japan (CC BY-SA 2.1 JP).
+https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en
+Source: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/ (via the GitHub mirror
+https://github.com/Kevin-Mattheus-Moerman/BodyParts3D)
+
+Changes made for VitalOrbit: selected parts (skin, brain, heart, lungs, trachea,
+skeleton, main arteries and veins, abdominal organs) were merged into named groups,
+reoriented to a Y-up coordinate system in meters, the skin was split into head, torso
+and limbs, polygon counts were reduced with meshoptimizer, and the result was
+compressed with EXT_meshopt_compression.
+
+This file (body.glb) is a derivative work and is distributed under the same license,
+CC BY-SA 2.1 JP.

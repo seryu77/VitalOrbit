@@ -10,8 +10,8 @@ VitalOrbit is a health monitoring tool that helps astronauts assess their own he
 |---|---|
 | **Event** | 2026 NASA Space Apps Challenge |
 | **Challenge** | [Create Health Monitoring Software for Astronauts on Space Missions](https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/) |
-| **Team** | TBD |
-| **Team members** | TBD |
+| **Team** | Semangat Kuliah |
+| **Team members** | Faiz (Tech Lead), Caka (Product Manager), Al Fachrezi (Software Engineer), Rafiandhi (Solution Architect) |
 | **Live demo** | TBD |
 | **Project demo (slides or video)** | TBD |
 
@@ -112,8 +112,13 @@ AI tools were used in this project, and we disclose that use here as required by
 | Documentation | Claude (Anthropic) | Drafting and structuring the documents in this repository |
 | Code | Claude (Anthropic) | Writing the application code under the team's direction. Every AI-assisted source file is marked with a header comment, and the page metadata and footer state it as well |
 | Simulated data | Claude (Anthropic) | Writing the code that generates the simulated readings |
+| Pitch deck | Claude (Anthropic) | Drafting slide text and layout in Canva. All photos in the deck are real NASA images, not AI-generated |
 
-The project idea and its direction come from the team. No AI-generated images, video, or audio are used at this time. If any are added, they will carry a visible watermark. This project does not use NASA logos, flags, or mission identifiers.
+The project idea and its direction come from the team. No AI-generated images, video, or audio are used at this time. If any are added, they will carry a visible watermark. Apart from the official NASA Space Apps Challenge logo on the pitch deck cover, which identifies the event, this project does not use NASA logos, flags, or mission identifiers.
+
+## Image credits
+
+The pitch deck uses public-domain photos from NASA and NASA/JPL-Caltech (including NASA/JPL-Caltech/MSSS). Each image, its source page, and its credit are listed in [docs/PHOTO_CREDITS.md](docs/PHOTO_CREDITS.md).
 
 ## Repository structure
 
@@ -154,6 +159,7 @@ vitalorbit/
 ## Documentation
 
 - [Features](docs/FEATURES.md)
+- [Feature ideas and roadmap](docs/FEATURE-IDEAS.md)
 - [Product requirements](docs/PRD.md)
 - [System design](docs/system-design.md)
 - [Architecture](docs/architecture.md)
