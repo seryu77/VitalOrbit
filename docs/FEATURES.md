@@ -10,7 +10,7 @@ This document lists every feature in the current prototype, and what is not buil
 | Mission profile | Choose Space station, Moon, Mars, or Rover. Each shows its communication delay and sets the radiation limit |
 | Mission day | The current mission day is shown in the header |
 | Earth link toggle | Simulates the link to Earth going up or down. The label shows the delay when the link is up, or "working offline" when it is down |
-| Demo scenarios | Six buttons that change the astronaut's recent readings: Normal day, Fever, Sleep debt, Cardiac event, Low mood, Solar storm |
+| Demo scenarios | Seven buttons that change the astronaut's recent readings: Normal day, Fever, Sleep debt, Cardiac event, Low mood, Solar storm, Slow drift |
 | Simulated data tag | A visible "SIMULATED DATA" tag on every screen |
 | Saved settings | Mission, scenario, link state, and the mood answer are saved in the browser, so they survive a reload. No server is used |
 | Disclaimer footer | States that data is simulated, thresholds are illustrative, the tool is not a medical device, and AI assistance was used |
@@ -140,7 +140,21 @@ A line is drawn down the middle of the body on the camera preview, with a mark f
 | Exercise | "+30 min" adds exercise minutes to today, which updates the streak and points |
 | Reset demo | Clears the alert log and today's entries |
 
-## 8. Optional local real-time server
+## 8. Insights
+
+All insights are rule based and run on the device. They never change a status: the assessment engine stays the source of truth.
+
+| Feature | Description |
+|---|---|
+| Health score 0 to 100 | Shown in the overall status panel as a ring. Each yellow indicator removes 8 points, each red one 22, a finding that persists for more than 3 days 4 more, and an open camera finding counts too. "Why this score?" lists every deduction with its reason. Green from 85, yellow from 60 |
+| Live heart rate graph | A rolling 60-second graph with the normal range shaded and today's resting value as a dashed line. It shows the current, minimum, and maximum value. The stream is simulated around the day's reading, or uses the local real-time server when it runs |
+| Summary | A short paragraph in plain language that names the critical and attention items, the nearest early warning, and anything that has persisted for days. It is written by rules. An on-board language model is planned |
+| Early warning | Fits a trend line to the last 7 days of each normal indicator and warns when it would leave the normal range within 7 days. The "Slow drift" scenario shows it |
+| Possible causes | Eight rules match combinations of readings (for example fever with a raised heart rate) to a possible cause, with steps, the items from an illustrative on-board medical kit, and when to escalate. Marked as decision support, not a diagnosis |
+| Report to Earth | A report is built automatically from the readings, alerts, score, and possible causes. It is marked priority when anything is critical, and the panel says whether it waits on board or was sent. It can be previewed and downloaded as a text file with no link |
+| Flight surgeon | The flight surgeon view shows each crew member's score, early warnings, and the same downloadable report |
+
+## 9. Optional local real-time server
 
 | Feature | Description |
 |---|---|
@@ -150,7 +164,7 @@ A line is drawn down the middle of the body on the camera preview, with a mark f
 
 Start it with `npm run server`.
 
-## 9. Accessibility and design
+## 10. Accessibility and design
 
 - Status is always shown with color, an icon, and a text label together.
 - Dark theme with high-contrast text.
@@ -158,7 +172,7 @@ Start it with `npm run server`.
 - Keyboard access, visible focus, and ARIA labels on the body map, tabs, and toggles.
 - Responsive layout: side by side on wide screens, a single column below 1024 px.
 
-## 10. Not built yet
+## 11. Not built yet
 
 | Feature | Status |
 |---|---|
@@ -168,8 +182,9 @@ Start it with `npm run server`.
 | Hosted real-time server | The optional server runs locally only. It is not deployed |
 | Reminders when the app is closed | Reminders and notifications work while the app is open in a tab |
 | Delay-aware sync | Planned |
+| On-board language model for the summary | Planned. The summary is written by rules today |
 
-## 11. Status against the PRD
+## 12. Status against the PRD
 
 | ID | Requirement | Status |
 |---|---|---|

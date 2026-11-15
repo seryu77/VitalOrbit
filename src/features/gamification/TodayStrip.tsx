@@ -47,7 +47,7 @@ export function TodayStrip(p: Props) {
     <section className="block today">
       <header className="block-head">
         <h2>
-          <span className="idx mono">05</span> Today
+          <span className="idx mono">07</span> Today
         </h2>
         <span className="label mono">Mission day {today.day}</span>
       </header>

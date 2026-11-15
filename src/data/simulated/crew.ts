@@ -98,6 +98,11 @@ function applyScenario(m: CrewMember, scenario: ScenarioId, profile: MissionProf
       last(1).radiation = round(profile.radLimit * 0.9, 2);
       last(0).radiation = round(profile.radLimit * 1.35, 2);
       break;
+    case "drift":
+      // Still normal today, but trending toward the edge of the normal range.
+      [104, 107, 110, 113, 116, 119, 122].forEach((v, i) => (last(6 - i).bp = v));
+      [82, 84, 86, 88, 90, 92, 94].forEach((v, i) => (last(6 - i).glucose = v));
+      break;
     case "nominal":
       break;
   }
@@ -127,4 +132,5 @@ export const SCENARIOS: { id: ScenarioId; label: string }[] = [
   { id: "cardiac", label: "Cardiac event" },
   { id: "isolation", label: "Low mood" },
   { id: "storm", label: "Solar storm" },
+  { id: "drift", label: "Slow drift" },
 ];

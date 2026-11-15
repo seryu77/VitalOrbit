@@ -7,6 +7,10 @@ import type { Assessment, CrewMember, IndicatorId, LogEntry, MissionProfile, Sta
 import { AlertLog } from "../alerts/AlertLog";
 import { DetailPanel } from "../guidance/DetailPanel";
 import { SyncPanel } from "../sync/SyncPanel";
+import { EarthReportPanel } from "../insights/EarthReportPanel";
+import { alertsFor } from "../../lib/engine";
+import { earlyWarnings, earthReport, healthScore, possibleCauses } from "../../lib/insights";
+import { isHealthIndicator } from "../../lib/types";
 
 interface Props {
   crew: CrewMember[];
@@ -25,6 +29,11 @@ export function SurgeonView({ crew, assessmentsById, overallById, log, linkOn, p
   const assessments = assessmentsById[crewId];
   const current = assessments.find((a) => a.indicator === indicator)!;
   const memberLog = log.filter((e) => e.crewId === crewId);
+  const camera = memberLog.filter((e) => !isHealthIndicator(e.indicator) && e.ackAt === null);
+  const alerts = [...alertsFor(member, assessments), ...camera];
+  const score = healthScore(assessments, camera);
+  const forecasts = earlyWarnings(member, assessments);
+  const report = earthReport(member, assessments, alerts, profile, score, possibleCauses(assessments));
 
   return (
     <>
@@ -45,6 +54,16 @@ export function SurgeonView({ crew, assessmentsById, overallById, log, linkOn, p
             </button>
           ))}
         </div>
+
+        <p className="sv-score">
+          <span className="mono">Health score</span> <strong>{score.score}/100</strong>
+          {forecasts.length > 0 && (
+            <span className="muted">
+              {" "}
+              · Early warning: {forecasts.map((f) => `${INDICATOR_BY_ID[f.indicator].label} in ~${f.days} d`).join(", ")}
+            </span>
+          )}
+        </p>
 
         <div className="table-wrap">
         <table className="table">
@@ -90,6 +109,11 @@ export function SurgeonView({ crew, assessmentsById, overallById, log, linkOn, p
       </section>
 
       <DetailPanel member={member} assessment={current} showGuidance={false} />
+
+      <section className="panel">
+        <h2>Report from on board: {member.name}</h2>
+        <EarthReportPanel report={report} linkOn={linkOn} profile={profile} />
+      </section>
 
       <section className="panel">
         <h2>Alert log: {member.name}</h2>

@@ -84,12 +84,16 @@ Each idea has a size: **S** (hours), **M** (days), **L** (weeks or more, needs h
 
 ## 3. Suggested priority
 
-### Can be built quickly (hours, builds on the prototype)
+### Built in the prototype
 1. Overall health score 0 to 100 with a breakdown (#10)
 2. Real-time heart rate rolling graph (#9)
 3. Resource-based suggestion for possible causes (#11), rule based
 4. Automatic Earth report builder for red status (#7), simulated
 5. Alert acknowledgment (S)
+6. Plain-language summary, rule based (first step toward #3)
+7. Early warning trend
+8. Data export (report as a text file)
+9. Camera safety check and spine screening cue (first step toward #2 and #8)
 
 ### Next phase (days)
 - LLM summary of the numbers (#3), local model

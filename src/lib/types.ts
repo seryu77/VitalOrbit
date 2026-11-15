@@ -90,7 +90,7 @@ export interface Alert {
   day: number;
 }
 
-export type ScenarioId = "nominal" | "fever" | "sleep" | "cardiac" | "isolation" | "storm";
+export type ScenarioId = "nominal" | "fever" | "sleep" | "cardiac" | "isolation" | "storm" | "drift";
 
 /** An alert as kept in the on-device log, with its time, acknowledgment, and delivery to the flight surgeon. */
 export interface LogEntry extends Alert {

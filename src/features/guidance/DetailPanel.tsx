@@ -26,7 +26,7 @@ export function DetailPanel({ member, assessment, showGuidance = true }: Props) 
     <section className={`block detail detail-${assessment.status}`} aria-live="polite">
       <header className="block-head">
         <h2>
-          {showGuidance && <span className="idx mono">03</span>} {def.label}
+          {showGuidance && <span className="idx mono">04</span>} {def.label}
         </h2>
         <span className="label mono">
           {def.source} · {def.hazard} · Day {lastDay}

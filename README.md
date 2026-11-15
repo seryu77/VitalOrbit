@@ -12,7 +12,7 @@ VitalOrbit is a health monitoring tool that helps astronauts assess their own he
 | **Challenge** | [Create Health Monitoring Software for Astronauts on Space Missions](https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/) |
 | **Team** | Semangat Kuliah |
 | **Team members** | Faiz (Tech Lead), Caka (Product Manager), Al Fachrezi (Software Engineer), Rafiandhi (Solution Architect) |
-| **Live demo** | TBD |
+| **Live demo** | [seryu77.github.io/VitalOrbit](https://seryu77.github.io/VitalOrbit/) |
 | **Project demo (slides or video)** | TBD |
 
 ## The problem
@@ -192,7 +192,7 @@ Other commands:
 
 ## How to try the demo
 
-1. Use the **Demo scenario** buttons (Fever, Sleep debt, Cardiac event, Low mood, Solar storm) to simulate a health event for the astronaut.
+1. Use the **Demo scenario** buttons (Fever, Sleep debt, Cardiac event, Low mood, Solar storm, Slow drift) to simulate a health event for the astronaut.
 2. Watch the overall status, the body map, and the indicator cards change color.
 3. Select an indicator or a body part to see its trend, a plain explanation, and what to do now.
 4. Answer the **Mood check** to see how your own input changes the assessment.
@@ -202,6 +202,9 @@ Other commands:
 8. Enter a value in **Log a checkup** (for example systolic pressure 190) and watch the status turn critical.
 9. Press **Start safety camera**, then stay still. After the set time you are asked "Are you OK?". Do not answer, and a red alert reaches the Crew view and the sync queue. Use **Test alert flow** to skip the wait.
 10. Open the **Alert log** to see each alert with its time, delivery state, and acknowledgment. Turn the Earth link on to watch queued reports being sent.
+11. Look at the **Health score** in the status panel and select **Why this score?** to see every deduction.
+12. Open **Insights** for the summary, the early warning (try **Slow drift**), and possible causes with the items from the medical kit.
+13. In **Report to Earth**, preview or download the report that was built automatically.
 
 ## License
 

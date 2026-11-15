@@ -1,5 +1,5 @@
 // AI-assisted: written with help from Claude (Anthropic). See README, "Use of AI tools".
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { StatusIcon } from "../../components/StatusIcon";
 import { INDICATOR_BY_ID, REGIONS } from "../../data/rules/indicators";
 import { STATUS_LABEL, worst } from "../../lib/engine";
@@ -23,6 +23,11 @@ import { TodayStrip } from "../gamification/TodayStrip";
 import { SyncPanel } from "../sync/SyncPanel";
 import { DetailPanel } from "../guidance/DetailPanel";
 import { IndicatorCard } from "../vitals/IndicatorCard";
+import { EarthReportPanel } from "../insights/EarthReportPanel";
+import { HealthScore } from "../insights/HealthScore";
+import { InsightsPanel } from "../insights/InsightsPanel";
+import { LiveHeart } from "../insights/LiveHeart";
+import { earlyWarnings, earthReport, healthScore, possibleCauses, summary } from "../../lib/insights";
 
 // three.js is large, so the 3D body map loads separately from the rest of the dashboard.
 const BodyMap3D = lazy(() => import("../body-map/BodyMap3D").then((m) => ({ default: m.BodyMap3D })));
@@ -136,6 +141,22 @@ export function AstronautView({
   };
   const recent = (id: IndicatorId) => member.history.slice(-14).map((d) => d.values[id]);
 
+  // Insights: score, early warning, possible causes, summary, and the report for Earth.
+  const insights = useMemo(() => {
+    const camera = alerts.filter((a) => !isHealthIndicator(a.indicator));
+    const score = healthScore(assessments, camera);
+    const forecasts = earlyWarnings(member, assessments);
+    const causes = possibleCauses(assessments);
+    return {
+      score,
+      forecasts,
+      causes,
+      text: summary(member, assessments, score, forecasts),
+      report: earthReport(member, assessments, alerts, profile, score, causes),
+    };
+  }, [member, assessments, alerts, profile]);
+  const hrNow = assessments.find((a) => a.indicator === "hr")!;
+
   return (
     <>
       {showWarning && (
@@ -171,6 +192,7 @@ export function AstronautView({
             {STATUS_LABEL[overall]}
           </p>
           <p className="sd-text">{OVERALL_TEXT[overall]}</p>
+          <HealthScore score={insights.score} />
           <div className="sd-meta">
             <span className="mono">
               {counts.red} critical · {counts.yellow} attention · {assessments.length - counts.red - counts.yellow} normal
@@ -202,11 +224,21 @@ export function AstronautView({
         </div>
       </section>
 
+      <section className="block">
+        <header className="block-head">
+          <h2>
+            <span className="idx mono">01</span> Live heart rate
+          </h2>
+          <span className="label mono">Wearable · real time</span>
+        </header>
+        <LiveHeart resting={hrNow.value} bands={hrNow.bands} serverOffset={liveVitals ? liveVitals.hr : null} />
+      </section>
+
       <div className="grid-main">
         <section className={`block block-map${mapOpen ? "" : " is-collapsed"}`}>
           <header className="block-head">
             <h2>
-              <span className="idx mono">01</span> Body map
+              <span className="idx mono">02</span> Body map
             </h2>
             <button className="btn btn-line btn-sm map-toggle" onClick={() => setMapOpen((o) => !o)} aria-expanded={mapOpen}>
               {mapOpen ? "Hide" : "Show"}
@@ -229,7 +261,7 @@ export function AstronautView({
         <section className="block">
           <header className="block-head">
             <h2>
-              <span className="idx mono">02</span> Health indicators
+              <span className="idx mono">03</span> Health indicators
             </h2>
             {region ? (
               <button className="btn btn-line btn-sm" onClick={() => setRegion(null)}>
@@ -260,11 +292,21 @@ export function AstronautView({
         <DetailPanel member={member} assessment={current} />
       </div>
 
+      <section className="block">
+        <header className="block-head">
+          <h2>
+            <span className="idx mono">05</span> Insights
+          </h2>
+          <span className="label mono">On board · rule based</span>
+        </header>
+        <InsightsPanel summary={insights.text} forecasts={insights.forecasts} causes={insights.causes} onOpen={open} />
+      </section>
+
       <div className="grid-even">
         <section className="block scroll-anchor" ref={alertsRef}>
           <header className="block-head">
             <h2>
-              <span className="idx mono">04</span> Alerts
+              <span className="idx mono">06</span> Alerts
             </h2>
             <span className="label mono">{alerts.length} active</span>
           </header>
@@ -281,7 +323,17 @@ export function AstronautView({
       <section className="block">
         <header className="block-head">
           <h2>
-            <span className="idx mono">07</span> Alert log
+            <span className="idx mono">08</span> Report to Earth
+          </h2>
+          <span className="label mono">Built automatically</span>
+        </header>
+        <EarthReportPanel report={insights.report} linkOn={linkOn} profile={profile} />
+      </section>
+
+      <section className="block">
+        <header className="block-head">
+          <h2>
+            <span className="idx mono">09</span> Alert log
           </h2>
         </header>
         <AlertLog entries={log.filter((e) => e.crewId === member.id)} linkOn={linkOn} />
