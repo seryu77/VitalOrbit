@@ -68,7 +68,9 @@ Crew member selection, full indicator history, trend charts, alert log, and sync
 
 ## 4. Body map
 
-- A simple, neutral human figure with selectable regions: head, heart, lungs, torso, bones and muscles.
+- A neutral human figure with the skeleton, muscles, organs, and brain, and selectable regions: head, heart, lungs, torso, bones and muscles, and whole body.
+- From a distance, each region has a label with its name and status (icon and word), so the overall state is readable at a glance.
+- Selecting a region zooms in, names its parts, shows finer detail, and opens a card with its indicators. Text stays the same size at every zoom level.
 - Each region takes the color of its most serious indicator.
 - Selecting a region lists its indicators and opens the indicator detail.
 - The figure is abstract and does not depict a real person.

@@ -152,15 +152,30 @@ A missed reminder is shown as overdue. It does not raise an alert on its own.
 
 Purpose: detect an emergency when the astronaut cannot report it.
 
-1. The camera feed is processed on the device with a pose estimation model.
-2. If a person is detected but their body landmarks stay nearly still for longer than a set time, the system asks for a response on screen.
-3. If there is no response, a red alert is raised.
+1. The camera feed is processed on the device with body pose, hand, and face landmark models.
+2. If a person is detected but their body landmarks stay nearly still for longer than a set time (15 seconds by default), the system asks for a response on screen and sounds a beep.
+3. The person responds by pressing a button, or by moving or waving.
+4. If there is no response within a set time (8 seconds by default), a red alert is raised. It stays open until the person cancels it.
+5. If the person leaves the camera view, the check is cancelled. Absence alone is not evidence of an emergency.
 
 Constraints:
 
 - Video is never stored or transmitted. Only the alert is recorded.
-- Pose models are trained on Earth data. In microgravity the body rests in a different neutral posture, so posture-based judgments are out of scope. The check is limited to movement and responsiveness.
+- Pose models are trained on Earth data. In microgravity the body rests in a different neutral posture, so the safety check does not judge posture. It is limited to movement and responsiveness.
+- A separate, optional spine check measures posture. It is a screening cue with illustrative thresholds, and it is Earth-calibrated. See section 7.1.
 - The check can be turned off by the crew member.
+
+### 7.1 Spine check
+
+Purpose: notice a posture pattern that may point to a spine problem, such as a lateral curve (scoliosis-like), a forward head, or a rounded upper back, and suggest follow-up. It does not diagnose.
+
+1. The body pose model gives the ears, shoulders, and hips for each frame.
+2. The system builds a spine axis through three points: the head, the shoulders (C7), and the hips (sacrum).
+3. Facing the camera, it measures shoulder tilt, hip tilt, trunk lean, bend at the shoulders, and head offset. Sideways, it measures the head angle and the roundness of the upper back.
+4. A run of eight seconds takes the median of each measurement and compares it with illustrative thresholds: aligned, mild, or marked.
+5. A mild or marked result creates a yellow alert for the astronaut, with a recommendation to contact the flight surgeon if it is marked and persists.
+
+The camera sees only the surface, so the curve of the spine itself is not measured. A clinical exam and an X-ray are needed to confirm any finding.
 
 ## 8. Mission profiles
 
@@ -182,7 +197,9 @@ The profile affects how the sync state is shown and how strongly the system favo
 - When a link is available, queued reports are sent, with red alerts first.
 - The astronaut can always see what has been sent and what is waiting.
 
-In the prototype, the link is simulated with a toggle.
+In the prototype, the link is simulated with a toggle. Red alerts are queued in the on-device log and, when the toggle is on, sent one at a time with the send time recorded.
+
+An optional local server relays alerts between open windows and streams a simulated wearable feed. It does not replace the on-device log: alerts are stored on the device first.
 
 ## 10. Privacy and safety
 

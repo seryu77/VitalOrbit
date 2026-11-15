@@ -23,9 +23,13 @@ This document lists every feature in the current prototype, and what is not buil
 - The Critical banner pulses slowly. The pulse is turned off if the user prefers reduced motion.
 
 ### Body map
-- An abstract human figure with six clickable regions: head, heart, lungs, torso, bones and muscles, and whole body.
-- Each region takes the color of its most serious indicator.
-- Selecting a region highlights its indicators and dims the others. "Show all" clears the filter.
+- A human figure with the skeleton, muscles, organs, and brain: skull, spine, ribcage, pelvis, arm and leg bones, lungs and airway, heart and aorta, liver, stomach, and intestines. It is a generic figure and does not depict a real person.
+- Six clickable regions: head, heart, lungs, torso, bones and muscles, and whole body (radiation ring). Each takes the color of its most serious indicator.
+- **From a distance:** every region has a label with its name, a status icon, and a status word, joined to the figure by a line. The state of the whole body can be read without selecting anything.
+- **Up close:** selecting a region zooms in with a smooth animation, dims the other regions, names the parts (for example brain, skull, jaw, neck), and reveals finer detail such as brain folds, heart chambers, bronchial branches, muscle fibers, and the kneecap. Text keeps the same size at every zoom level.
+- A detail card under the figure explains the region and lists its indicators with value and status. Selecting an indicator there opens its full detail.
+- "Zoom out", Escape, or selecting the region again returns to the whole body. Reduced-motion settings turn the animation off.
+- Selecting a region also highlights its indicators and dims the others. "Show all" clears the filter.
 - A text legend gives the same selection without using the figure, and works with a keyboard.
 
 ### Health indicators (9)
@@ -94,7 +98,59 @@ Opens when a card, a body region, or an alert is selected. By default it shows t
 | Overall status | The most serious status among all indicators |
 | Alert creation | Every yellow or red status creates an alert, most serious first |
 
-## 6. Accessibility and design
+## 6. Camera safety check
+
+- Turned on by the user with "Start safety camera". The browser asks for camera permission, and the check can be turned off at any time.
+- Three MediaPipe models run in the browser on every frame: Pose Landmarker (33 body points), Hand Landmarker (21 points per hand, up to two hands), and Face Landmarker (478 points, including the irises). The models and runtime are bundled with the app, so the check works offline.
+- The camera preview shows what was found: a face mesh with the eyes, brows, lips, face outline, and irises in separate colors; the body skeleton; and every joint of each hand, with the thumb, index, middle, ring, and little finger in their own colors and a larger dot on each fingertip.
+- A readout under the preview lists how many points were found for the body, face, and hands, and the frame rate. For each hand it shows how many fingers are open and which ones, so an open hand reads as five fingers.
+- "Enlarge" makes the preview bigger for more detail. The body, hands, and face layers can each be turned off.
+- The check follows movement of the body, each hand, and the face, so it still works when the person is close to the camera and only the face or hands are in view. A moving finger counts as movement. Small jitter is ignored. After the set time without movement (15 seconds by default) a full-screen "Are you OK?" prompt appears with a countdown and a beep.
+- The person answers by pressing "I'm OK", or by moving or waving.
+- With no answer after the set time (8 seconds by default), a red alert is raised. It shows in the astronaut alerts, the crew emergency list, the alert log, and the sync queue, and the overall status turns Critical.
+- The alert stays open until the person cancels it with "I'm OK, cancel the alert", or acknowledges it in the alert list.
+- Both times can be changed with sliders. "Test alert flow" starts the check at once, for demos.
+- A person who leaves the view cancels the check, because absence alone is not evidence of an emergency.
+- Video is never stored or sent. Only the alert is kept. The safety check does not judge posture. Posture is covered by the separate spine check below.
+- The face and hand models are used for tracking only. The app does not identify people, read expressions, or keep any face data.
+
+### Spine check (screening cue)
+
+A line is drawn down the middle of the body on the camera preview, with a mark for each of the 24 vertebrae (7 neck in blue, 12 chest in white, 5 lower back in orange), labeled C7 and Sacrum, and a dashed vertical reference line.
+
+- **What it can see.** The camera sees only the surface of the body. The spine line is estimated from three measured points: the head (ears), the shoulders, and the hips. The curve between them is not measured, and the vertebra marks are placed along the line by proportion. It cannot show the real shape of the spine.
+- **Facing the camera** it measures the tilt of the shoulder line and the hip line, the lean of the trunk from vertical, the bend of the axis at the shoulders, and the sideways offset of the head. Shoulders and hips tilting in opposite directions, with a lean or bend, is reported as a pattern consistent with a lateral curve (scoliosis-like).
+- **Standing sideways** it measures the head angle (how far forward the head sits) and how far the ear, shoulder, and hip are from a straight line. A forward head or a rounded upper back is reported as a pattern consistent with kyphosis-like posture.
+- The view is chosen automatically from the proportions of the body. Part way between the two views gives no reading.
+- A live readout and a color on the spine line (green aligned, yellow mild, red marked) update as the person moves.
+- **Run spine check (8 s)** takes the middle value of every measurement over eight seconds, so noise in single frames does not decide. The result shows a summary and the specific findings.
+- A mild or marked result is added to the alert log and the alert list as an **Attention** alert for the astronaut. It does not notify the crew or queue a report, because posture is not an emergency. A marked result advises contacting the flight surgeon if it persists.
+- The thresholds are illustrative: 3° and 6° for tilts and lean, 4° and 8° for bend, 50° and 40° for the head angle, 15° and 25° for back rounding.
+- **Limits.** It is a screening cue, not a diagnosis. A curve of the spine is confirmed only by a clinical exam and an X-ray. The camera must be level, because a tilted camera tilts every angle. In microgravity the spine lengthens and the neutral posture changes, so a real system would need calibration against the person's own baseline.
+
+## 7. More astronaut tools
+
+| Feature | Description |
+|---|---|
+| Log a checkup | Enter systolic blood pressure, body mass, and blood glucose. Values are range-checked, the assessment updates at once, and recent entries are listed. Values stay until the scenario changes or the demo is reset |
+| Alert log | Every alert is kept on the device with its time, source, status, cause, delivery, and acknowledgment. It can be filtered by status. The same log is shown to the flight surgeon for each crew member |
+| Acknowledge | Each alert has an Acknowledge button. A camera alert is cancelled with "I'm OK" |
+| Sync queue | Red alerts are queued for the flight surgeon. When the Earth link is on, they are sent one at a time, with the send time recorded. The panel shows how many were sent and how many are waiting |
+| Reminders | Checkup, mood check, exercise, and water. Water is due every 30 minutes by default, or every 1 minute, 1 hour, or 2 hours. A toast appears on screen and, if permitted, a browser notification |
+| Exercise | "+30 min" adds exercise minutes to today, which updates the streak and points |
+| Reset demo | Clears the alert log and today's entries |
+
+## 8. Optional local real-time server
+
+| Feature | Description |
+|---|---|
+| Wearable stream | The server sends heart rate and blood oxygen offsets every second, and the cards show them |
+| Shared alerts | Alerts and acknowledgments are relayed to every open window, and saved in a local SQLite file. A window that joins later receives the recent alerts |
+| Offline fallback | The header shows whether the server is connected. When it is not, the app uses its on-device simulator. Alerts raised offline are sent when the server returns |
+
+Start it with `npm run server`.
+
+## 9. Accessibility and design
 
 - Status is always shown with color, an icon, and a text label together.
 - Dark theme with high-contrast text.
@@ -102,21 +158,18 @@ Opens when a card, a body region, or an alert is selected. By default it shows t
 - Keyboard access, visible focus, and ARIA labels on the body map, tabs, and toggles.
 - Responsive layout: side by side on wide screens, a single column below 1024 px.
 
-## 7. Not built yet
+## 10. Not built yet
 
 | Feature | Status |
 |---|---|
-| Camera safety check (computer vision) | Planned. Not in the prototype |
 | Microscope analysis of blood and saliva | Planned |
 | On-board sequencing for virus detection | Planned |
 | Real wearable and IoT integration | Planned. The prototype uses simulated data |
-| Manual entry of checkup values | Not built. Only the mood check accepts input |
-| Real sync queue | Not built. The Earth link is a toggle that changes what the screens say |
-| Alert acknowledgment and full history | Not built. Alerts reflect the latest day only |
-| Scheduled reminders with notifications | Not built. Reminders are shown on screen only |
+| Hosted real-time server | The optional server runs locally only. It is not deployed |
+| Reminders when the app is closed | Reminders and notifications work while the app is open in a tab |
 | Delay-aware sync | Planned |
 
-## 8. Status against the PRD
+## 11. Status against the PRD
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -126,17 +179,17 @@ Opens when a card, a body region, or an alert is selected. By default it shows t
 | A4 | Next steps for yellow and red | Done |
 | A5 | Plain-language explanations | Done |
 | A6 | Overall status | Done |
-| A7 | Reminders | Partial (shown on screen, not scheduled) |
-| A8 | Manual entry | Partial (mood check only) |
+| A7 | Reminders | Done (on screen and browser notifications while the app is open) |
+| A8 | Manual entry | Done (checkup values and mood check) |
 | A9 | Points and streaks | Done |
 | E1 | Yellow notifies the astronaut only | Done |
 | E2 | Red notifies the crew and queues a flight surgeon report | Done (simulated) |
 | E3 | Clear escalation guidance | Done |
-| E4 | Alert log | Partial (latest day only) |
+| E4 | Alert log | Done |
 | C1 | Crew view | Done |
 | C2 | Flight surgeon view | Done |
-| C3 | Sync state | Partial (link toggle and waiting count) |
+| C3 | Sync state | Done (simulated link, queue with sent and waiting reports) |
 | M1 | Mission profiles | Done |
 | M2 | Communication delay | Done |
 | M3 | Works offline | Done (no server, settings saved on the device) |
-| V1, V2 | Camera safety check | Not built |
+| V1, V2 | Camera safety check | Done (on-device, no video stored) |

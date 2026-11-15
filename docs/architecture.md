@@ -4,11 +4,12 @@ This document describes how the code is organized. For how the system behaves, s
 
 ## 1. Approach
 
-VitalOrbit is a **static, client-side web application**. There is no backend server.
+VitalOrbit is a **static, client-side web application**. It needs no backend. A small **optional local server** adds a real-time feed and shares alerts between windows, and the app falls back to its on-device simulator when the server is not running.
 
 | Decision | Reason |
 |---|---|
-| Client-side only | Matches the offline-first requirement: everything runs on the device |
+| Client-side first | Matches the offline-first requirement: everything runs on the device, and the server is optional |
+| Optional real-time server | Gives a live wearable stream and lets the astronaut, crew, and surgeon views run on different devices during the demo |
 | Static hosting | A public link with no login, as the hackathon requires |
 | Simulated data layer | Real devices are out of scope for the prototype |
 | Rules as data | Thresholds and hazard mapping live in data files, so they can be changed without touching the engine |
@@ -22,7 +23,8 @@ VitalOrbit is a **static, client-side web application**. There is no backend ser
 | Build tool | Vite |
 | Charts | Recharts |
 | Storage | Browser local storage |
-| Computer vision | MediaPipe Pose Landmarker, running in the browser |
+| Computer vision | MediaPipe Pose, Hand, and Face Landmarker, running in the browser. The three models (about 20 MB) and the WebAssembly runtime are bundled in `public/` |
+| Real-time server (optional) | Node.js, Fastify, WebSocket, and SQLite (`node:sqlite`) in `server/` |
 | Hosting | GitHub Pages |
 
 ## 3. Layers
@@ -67,7 +69,10 @@ src/
 ├── data/
 │   ├── simulated/     Simulated crew, readings, and scenarios
 │   └── rules/         Thresholds, trend rules, hazard map, guidance text
-└── lib/               Assessment engine, alert manager, storage, sync queue
+└── lib/               Assessment engine, alert log and sync queue, live server client
+
+server/                Optional real-time server
+scripts/               Copies the MediaPipe runtime into public/
 ```
 
 ## 5. Core modules
@@ -137,7 +142,7 @@ SyncItem
 ## 8. Camera safety check
 
 ```
- Webcam frame --> Pose Landmarker (in browser) --> Landmark positions
+ Webcam frame --> Pose, Hand, and Face Landmarker (in browser) --> Landmark positions
                                                         |
                                                         v
                                     Movement over time below threshold?
@@ -156,6 +161,7 @@ Frames are processed in memory and discarded. Nothing is stored or uploaded.
 - The app is built into static files and published to GitHub Pages.
 - The published link is public and needs no login.
 - No environment secrets are required.
+- The optional server is not deployed. It runs on the presenter's machine with `npm run server`. A page served over HTTPS can still reach it at `ws://localhost`, and without it the app uses its simulator.
 
 ## 10. Path to a real system
 
@@ -163,6 +169,6 @@ Frames are processed in memory and discarded. Nothing is stored or uploaded.
 |---|---|
 | Simulator | Adapters for wearables and station sensors |
 | Local storage | On-board database shared across crew devices |
-| Simulated link toggle | Delay-tolerant link to mission control |
+| Simulated link toggle, local relay server | Delay-tolerant link to mission control |
 | Illustrative rules | Thresholds set by flight surgeons, with personal baselines |
 | Webcam | Station cameras with a model calibrated for microgravity |

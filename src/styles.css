@@ -251,7 +251,7 @@ select {
 
 .dash {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr;
+  grid-template-columns: minmax(300px, 480px) 1fr;
   gap: 12px;
 }
 
@@ -390,66 +390,285 @@ select {
 
 /* Body map */
 
+.region-green {
+  --c: var(--green);
+}
+.region-yellow {
+  --c: var(--yellow);
+}
+.region-red {
+  --c: var(--red);
+}
+
+.bm-stage {
+  position: relative;
+}
+
 .bodymap svg {
   display: block;
   width: 100%;
-  max-width: 220px;
+  max-width: 480px;
   margin: 8px auto;
+  overflow: hidden;
 }
 
-.region {
+.bm-region {
   cursor: pointer;
-  stroke: var(--bg);
-  stroke-width: 3;
-  transition: opacity 0.15s;
+  transition: opacity 0.3s;
 }
-
-.region:hover {
-  opacity: 0.8;
+.bm-region:hover {
+  opacity: 0.85;
 }
-
-.region:focus-visible {
+.bm-region:focus-visible {
   outline: none;
+}
+.bm-region:focus-visible .bm-tint,
+.bm-region:focus-visible .bm-solid {
   stroke: var(--accent);
-  stroke-width: 4;
+  stroke-width: 3;
+}
+.bm-dim {
+  opacity: 0.22;
+}
+.bm-selected {
+  filter: drop-shadow(0 0 5px var(--c));
+}
+.bm-selected .bm-tint,
+.bm-selected .bm-solid {
+  stroke: var(--text);
+  stroke-width: 2.5;
 }
 
-.region-green {
-  fill: var(--green);
+.bm-tint {
+  fill: var(--c);
+  fill-opacity: 0.45;
+  stroke: var(--c);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.bm-solid {
+  fill: var(--c);
+  fill-opacity: 0.95;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.bm-organ {
+  fill: var(--c);
+  fill-opacity: 0.35;
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.bm-ring {
+  fill: var(--c);
+  fill-opacity: 0.05;
+  stroke: var(--c);
+  stroke-width: 2;
+  stroke-dasharray: 7 7;
+  vector-effect: non-scaling-stroke;
+}
+.bm-muscle {
+  stroke: var(--c);
+  stroke-opacity: 0.5;
+  stroke-linecap: round;
+  fill: none;
+}
+.bm-muscle-fill {
+  fill: var(--c);
+  fill-opacity: 0.5;
+}
+.bm-bone,
+.bm-bone-thin {
+  fill: none;
+  stroke: #e9eef7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.bm-bone {
+  stroke-width: 3;
+}
+.bm-bone-thin {
+  stroke-width: 1.6;
+  stroke-opacity: 0.85;
+}
+.bm-ribs .bm-bone-thin {
+  stroke-opacity: 0.55;
+}
+.bm-joint {
+  fill: #e9eef7;
+}
+.bm-vertebra {
+  fill: #e9eef7;
+  fill-opacity: 0.85;
+}
+.bm-line {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.bm-gut {
+  stroke-width: 3;
+}
+.bm-eye {
+  fill: var(--bg);
 }
 
-.region-yellow {
-  fill: var(--yellow);
+/* Fine detail appears only when a region is zoomed in. */
+.bm-fine {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.bm-fine-fill,
+.bm-fine-fill * {
+  fill: rgba(255, 255, 255, 0.8);
+  stroke: none;
+}
+.bodymap-zoomed .bm-fine {
+  opacity: 1;
 }
 
-.region-red {
-  fill: var(--red);
+.bm-part line {
+  stroke: var(--text);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.bm-part circle {
+  fill: var(--text);
+}
+.bm-part text {
+  fill: var(--text);
+  stroke: var(--bg);
+  paint-order: stroke;
+  font-weight: 600;
+  font-family: inherit;
+  stroke-linejoin: round;
 }
 
-ellipse.region {
+/* Labels for each region, readable from a distance. */
+.bm-far {
+  transition: opacity 0.3s;
+}
+.bm-far-hidden {
+  display: none;
+}
+.bm-label {
+  cursor: pointer;
+}
+.bm-label line {
+  stroke: var(--c);
+  stroke-width: 1.5;
+  stroke-opacity: 0.8;
+}
+.bm-label circle {
+  fill: var(--c);
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.bm-label rect {
+  fill: var(--surface-2);
+  stroke: var(--c);
   stroke-width: 2;
 }
-
-ellipse.region-green {
-  stroke: var(--green);
+.bm-label:hover rect {
+  fill: var(--border);
+}
+.bm-label-name {
+  fill: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+.bm-label-status {
+  fill: var(--c);
+  font-size: 11.5px;
+  font-weight: 700;
+  filter: brightness(1.35);
 }
 
-ellipse.region-yellow {
-  stroke: var(--yellow);
+.bm-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+}
+.bm-zoom-out {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.bm-zoom-out:hover {
+  border-color: var(--accent);
 }
 
-ellipse.region-red {
-  stroke: var(--red);
+.bm-detail {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--c);
+  border-radius: 12px;
+}
+.bm-detail h3 {
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bm-detail p {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.bm-indicators {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.bm-ind {
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 10px;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.bm-ind:hover {
+  border-color: var(--accent);
 }
 
-g.region ellipse {
-  stroke: var(--bg);
-}
-
-.region-selected,
-.region-selected * {
-  stroke: var(--text) !important;
-  stroke-width: 4;
+@media (prefers-reduced-motion: reduce) {
+  .bm-fine,
+  .bm-far,
+  .bm-region {
+    transition: none;
+  }
 }
 
 .bodymap-legend {
@@ -865,4 +1084,388 @@ g.region ellipse {
   .panel {
     overflow-x: auto;
   }
+}
+
+/* ---- Camera safety check ---- */
+.vision-dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vision-prompt {
+  border-color: var(--yellow);
+}
+.vision-alert {
+  border-color: var(--red);
+}
+.vision-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vision-head .link-button {
+  margin-left: auto;
+}
+.vision-chip {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+}
+.vision-chip-watching {
+  color: var(--green-text);
+  border-color: var(--green);
+}
+.vision-chip-prompt {
+  color: var(--yellow-text);
+  border-color: var(--yellow);
+}
+.vision-chip-alert {
+  color: var(--red-text);
+  border-color: var(--red);
+}
+.vision-view {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.vision-view video,
+.vision-view canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.vision-view-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.vision-meter {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.vision-meter div {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.25s linear;
+}
+.vision-line,
+.vision-privacy {
+  margin: 0;
+  font-size: 12px;
+}
+.vision-error {
+  margin: 0;
+  color: var(--red-text);
+  font-size: 14px;
+}
+.vision-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.vision-settings {
+  font-size: 13px;
+  color: var(--text-2);
+}
+.vision-settings label {
+  display: block;
+  margin-top: 8px;
+}
+.vision-settings input {
+  width: 100%;
+}
+.vision-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(5, 8, 16, 0.78);
+}
+.vision-card {
+  max-width: 460px;
+  padding: 28px;
+  text-align: center;
+  background: var(--surface);
+  border: 3px solid var(--yellow);
+  border-radius: 16px;
+}
+.vision-card-alert {
+  border-color: var(--red);
+  animation: vision-pulse 1.4s ease-in-out infinite;
+}
+.vision-card h2 {
+  margin-top: 0;
+  font-size: 28px;
+}
+@keyframes vision-pulse {
+  50% {
+    box-shadow: 0 0 0 10px rgba(214, 64, 69, 0.25);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vision-card-alert {
+    animation: none;
+  }
+  .vision-meter div {
+    transition: none;
+  }
+}
+
+/* ---- Buttons ---- */
+.btn {
+  min-height: 44px;
+  padding: 0 16px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.btn-quiet {
+  color: var(--text);
+  background: transparent;
+  border-color: var(--border);
+}
+.btn-big {
+  min-height: 56px;
+  padding: 0 28px;
+  font-size: 18px;
+  margin-top: 8px;
+}
+.chip-reset {
+  margin-left: auto;
+}
+
+/* ---- Checkup form, log, sync, reminders ---- */
+.checkup-form {
+  display: grid;
+  gap: 12px;
+}
+.checkup-form label {
+  display: grid;
+  gap: 4px;
+}
+.checkup-form input,
+.reminder-settings select {
+  min-height: 44px;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.checkup-form input[aria-invalid="true"] {
+  border-color: var(--red);
+}
+.checkup-form button {
+  justify-self: start;
+}
+.field-error {
+  color: var(--red-text);
+  font-size: 14px;
+  margin: 0;
+}
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+.alert-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.alert-acked {
+  opacity: 0.7;
+}
+.sync-counts {
+  margin: 4px 0;
+}
+.queue {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.reminder-settings {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.reminder-settings .check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.reminder-settings .inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.reminder-settings .check input {
+  width: 20px;
+  height: 20px;
+}
+.toasts {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 50;
+  display: grid;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+.toast {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+@media (max-width: 1023px) {
+  .vision-dock {
+    right: 8px;
+    bottom: 8px;
+    width: 220px;
+  }
+}
+
+/* ---- Camera detail ---- */
+.vision-large {
+  width: min(720px, calc(100vw - 32px));
+}
+.vision-seen {
+  font-size: 12px;
+}
+.vision-seen p {
+  margin: 2px 0;
+}
+.vision-hand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.vision-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+.vision-dots i {
+  width: 12px;
+  height: 12px;
+  border: 2px solid;
+  border-radius: 50%;
+  display: inline-block;
+}
+.vision-layers {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+.vision-layers .check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.vision-layers input {
+  width: 18px;
+  height: 18px;
+}
+@media (max-width: 1023px) {
+  .vision-large {
+    width: calc(100vw - 16px);
+  }
+}
+
+/* ---- Spine check ---- */
+.vision-spine {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.vision-spine p {
+  margin: 0;
+}
+.vision-spine-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.vision-metrics {
+  font-variant-numeric: tabular-nums;
+}
+.vision-level-0 {
+  color: var(--green-text);
+  border-color: var(--green);
+}
+.vision-level-1 {
+  color: var(--yellow-text);
+  border-color: var(--yellow);
+}
+.vision-level-2 {
+  color: var(--red-text);
+  border-color: var(--red);
+}
+.vision-result {
+  padding: 8px;
+  border: 1px solid;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.vision-result strong,
+.vision-result li {
+  color: var(--text);
+}
+.vision-result ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
 }
