@@ -26,8 +26,13 @@ export function TodayStrip({ member, moodToday, onMood }: Props) {
   );
 
   return (
-    <section className="panel today">
-      <h2>Today</h2>
+    <section className="block today">
+      <header className="block-head">
+        <h2>
+          <span className="idx mono">05</span> Today
+        </h2>
+        <span className="label mono">Mission day {today.day}</span>
+      </header>
       <div className="today-grid">
         <div className="today-item">
           <h3>Mood check {moodToday === null ? <span className="due">DUE</span> : <span className="done">DONE</span>}</h3>
@@ -57,6 +62,16 @@ export function TodayStrip({ member, moodToday, onMood }: Props) {
             <li>
               {today.exerciseMin >= EXERCISE_GOAL ? <span className="done">DONE</span> : <span className="due">DUE</span>}{" "}
               Exercise: {today.exerciseMin} of {EXERCISE_GOAL} min
+              <span
+                className="progress"
+                role="progressbar"
+                aria-label="Exercise today"
+                aria-valuemin={0}
+                aria-valuemax={EXERCISE_GOAL}
+                aria-valuenow={today.exerciseMin}
+              >
+                <span style={{ width: `${Math.min(100, (today.exerciseMin / EXERCISE_GOAL) * 100)}%` }} />
+              </span>
             </li>
             <li>
               <span className="due">DUE</span> Drink water (next reminder in 40 min)
@@ -66,12 +81,16 @@ export function TodayStrip({ member, moodToday, onMood }: Props) {
 
         <div className="today-item">
           <h3>Healthy habits</h3>
-          <p className="score">
-            <strong>{streak}</strong> day exercise streak
-          </p>
-          <p className="score">
-            <strong>{points}</strong> points in the last 30 days
-          </p>
+          <div className="scores">
+            <p className="score">
+              <strong>{streak}</strong>
+              <span>day exercise streak</span>
+            </p>
+            <p className="score">
+              <strong>{points}</strong>
+              <span>points, last 30 days</span>
+            </p>
+          </div>
           <p className="muted">10 points for a full exercise session, 10 for 7 or more hours of sleep.</p>
         </div>
       </div>

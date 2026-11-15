@@ -65,48 +65,14 @@ export function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            ◉
-          </span>
-          <div>
-            <h1>VitalOrbit</h1>
-            <p>Your health copilot, even when Earth is out of reach.</p>
-          </div>
-        </div>
-
-        <div className="mission">
-          <label>
-            Mission
-            <select value={profileId} onChange={(e) => update({ profileId: e.target.value })}>
-              {PROFILES.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <span className="pill">Day {MISSION_DAY}</span>
-          <button
-            className={`pill pill-button ${linkOn ? "pill-on" : "pill-off"}`}
-            onClick={() => update({ linkOn: !linkOn })}
-            aria-pressed={linkOn}
-            title="Simulate the link to Earth"
-          >
-            Earth link: {linkOn ? `up, ${profile.delayLabel}` : "down, working offline"}
-          </button>
-        </div>
-      </header>
-
-      <div className="demo-bar">
-        <span className="sim-tag">SIMULATED DATA</span>
-        <span>Demo scenario for the astronaut:</span>
-        <div className="scenario-buttons" role="group" aria-label="Demo scenario">
+      <div className="sim-strip">
+        <span className="sim-tag mono">Simulated data</span>
+        <span className="sim-label">Demo scenario for the astronaut</span>
+        <div className="scenarios" role="group" aria-label="Demo scenario">
           {SCENARIOS.map((s) => (
             <button
               key={s.id}
-              className={`chip${scenario === s.id ? " chip-active" : ""}`}
+              className={`scn${scenario === s.id ? " is-on" : ""}`}
               aria-pressed={scenario === s.id}
               onClick={() => update({ scenario: s.id, moodToday: null })}
             >
@@ -116,7 +82,56 @@ export function App() {
         </div>
       </div>
 
-      <nav className="tabs tabs-main" role="tablist" aria-label="View">
+      <header className="topbar">
+        <div className="brand">
+          <svg className="brand-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+            <circle cx="16" cy="16" r="5" fill="currentColor" />
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" transform="rotate(-28 16 16)" fill="none" stroke="currentColor" strokeWidth="1.25" />
+            <circle cx="28.3" cy="9.4" r="1.9" fill="currentColor" />
+          </svg>
+          <div>
+            <h1>VitalOrbit</h1>
+            <p>Your health copilot, even when Earth is out of reach.</p>
+          </div>
+        </div>
+
+        <dl className="telemetry">
+          <div className="tm">
+            <dt className="mono">
+              <label htmlFor="mission">Mission</label>
+            </dt>
+            <dd>
+              <select id="mission" value={profileId} onChange={(e) => update({ profileId: e.target.value })}>
+                {PROFILES.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </dd>
+          </div>
+          <div className="tm">
+            <dt className="mono">Mission day</dt>
+            <dd className="tm-value">{MISSION_DAY}</dd>
+          </div>
+          <div className="tm">
+            <dt className="mono">Earth link</dt>
+            <dd>
+              <button
+                className={`link-toggle ${linkOn ? "is-up" : "is-down"}`}
+                onClick={() => update({ linkOn: !linkOn })}
+                aria-pressed={linkOn}
+                title="Simulate the link to Earth"
+              >
+                <span className="link-led" aria-hidden="true" />
+                {linkOn ? `Up, ${profile.delayLabel}` : "Down, working offline"}
+              </button>
+            </dd>
+          </div>
+        </dl>
+      </header>
+
+      <nav className="tabs-main" role="tablist" aria-label="View">
         {ROLES.map((r) => (
           <button
             key={r.id}

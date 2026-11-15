@@ -26,9 +26,17 @@ export function CrewView({ crew, assessmentsById, alerts, linkOn }: Props) {
             const status = overallStatus(assessmentsById[m.id]);
             return (
               <li key={m.id} className={`crew-row crew-${status}`}>
-                <div>
-                  <strong>{m.name}</strong>
-                  <p className="muted">{m.role}</p>
+                <div className="crew-id">
+                  <span className="initials" aria-hidden="true">
+                    {m.name
+                      .split(" ")
+                      .map((w) => w[0])
+                      .join("")}
+                  </span>
+                  <div>
+                    <strong>{m.name}</strong>
+                    <p className="muted">{m.role}</p>
+                  </div>
                 </div>
                 <p className="crew-note">
                   {status === "red"

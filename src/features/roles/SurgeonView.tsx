@@ -55,6 +55,7 @@ export function SurgeonView({ crew, assessmentsById, alerts, linkOn, profile }: 
           ))}
         </div>
 
+        <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
@@ -94,6 +95,7 @@ export function SurgeonView({ crew, assessmentsById, alerts, linkOn, profile }: 
             })}
           </tbody>
         </table>
+        </div>
       </section>
 
       <DetailPanel member={member} assessment={current} showGuidance={false} />
