@@ -103,13 +103,20 @@ function applyScenario(m: CrewMember, scenario: ScenarioId, profile: MissionProf
   }
 }
 
-export function buildCrew(profile: MissionProfile, scenario: ScenarioId, moodToday: number | null): CrewMember[] {
+/** What the astronaut entered today. It replaces the simulated values for the latest day. */
+export interface TodayInput {
+  mood: number | null;
+  values: Partial<Record<IndicatorId, number>>;
+  extraExercise: number;
+}
+
+export function buildCrew(profile: MissionProfile, scenario: ScenarioId, today: TodayInput): CrewMember[] {
   const crew = SEEDS.map((s) => buildMember(s, profile));
   applyScenario(crew[0], scenario, profile);
-  // The astronaut's own answer to today's mood check replaces the simulated value.
-  if (moodToday !== null) {
-    crew[0].history[crew[0].history.length - 1].values.mood = moodToday;
-  }
+  const latest = crew[0].history[crew[0].history.length - 1];
+  Object.assign(latest.values, today.values);
+  if (today.mood !== null) latest.values.mood = today.mood;
+  latest.exerciseMin += today.extraExercise;
   return crew;
 }
 

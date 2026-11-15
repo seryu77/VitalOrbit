@@ -25,7 +25,7 @@ On long missions, astronauts must assess their own health. Flight surgeons on Ea
 - Real device integration. Readings are simulated.
 - Real medical thresholds. Values are illustrative.
 - Microscope and sequencing analysis. These are described as future work.
-- Accounts, authentication, and a backend server.
+- Accounts and authentication. The app does not need a server. A small optional local server is included for the real-time demo.
 
 ## 5. Users
 

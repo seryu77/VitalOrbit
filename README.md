@@ -40,11 +40,14 @@ VitalOrbit collects health indicators from several sources, turns them into a st
 - **Trend charts.** See how each indicator changes over the mission.
 - **Alerts and escalation.** Yellow stays with the astronaut. Red notifies the crew and queues a priority report for the flight surgeon.
 - **Guidance with limited resources.** Each yellow or red status comes with concrete steps that use only what is in the on-board medical kit.
-- **Measurement reminders.** Scheduled prompts for routine measurements and the daily mood check.
+- **Spine posture check (screening cue).** Draws an estimated spine line, with all 24 vertebrae marked, on the camera preview. From the head, shoulder, and hip positions it flags uneven shoulders or hips, a leaning trunk, a forward head, or a rounded upper back. It is a posture cue, not a diagnosis.
+- **Manual checkup entry.** Enter blood pressure, body mass, and blood glucose, and the assessment updates at once.
+- **Measurement reminders.** On-screen and browser notifications for the checkup, the mood check, exercise, and water.
+- **Alert log and sync queue.** Every alert is logged with its time and cause, can be acknowledged, and red reports wait on board until the Earth link is up.
 - **Light gamification.** Points and streaks for exercise, sleep, and on-time measurements.
 - **Mission profiles.** Space station, Moon, Mars, or rover, with a matching communication delay.
 - **Offline first.** Data is stored on the device and synced to Earth when a link is available.
-- **Camera safety check (planned, not in the prototype).** On-device computer vision that raises an alert when a crew member is motionless or unresponsive for too long. No video is stored.
+- **Camera safety check.** Uses the device camera and on-device tracking of the body, face (478 points), and both hands (21 points each, every finger) to detect a crew member who is motionless for too long, asks them to respond, and raises a red alert if they do not. No video is stored or sent.
 
 ## Three users, one system
 
@@ -58,12 +61,14 @@ VitalOrbit collects health indicators from several sources, turns them into a st
 
 | In the prototype | Planned next |
 |---|---|
-| Astronaut dashboard: body map, indicator cards, trend charts | Camera safety check with on-device computer vision |
-| Simulated wearable, checkup, and radiation data | Microscope image analysis for blood cells and bacteria |
-| Status rules, trend rules, and guidance | On-board sequencing for virus detection |
-| Alerts, reminders, mood check, points and streaks | Integration with real IoT devices |
-| Crew and flight surgeon views | Calibration of the vision model for microgravity |
-| Mission profiles and a simulated Earth link | Sync that adapts to the communication delay |
+| Astronaut dashboard: body map, indicator cards, trend charts | Microscope image analysis for blood cells and bacteria |
+| Simulated wearable, checkup, and radiation data, plus manual checkup entry | On-board sequencing for virus detection |
+| Status rules, trend rules, and guidance | Integration with real IoT devices |
+| Alerts with log, acknowledgment, and a sync queue for the flight surgeon | Calibration of the vision model for microgravity |
+| Reminders with notifications, mood check, points and streaks | Sync that adapts to the communication delay |
+| Camera safety check with on-device body, face, and finger tracking | Hosted real-time server (the prototype server runs locally) |
+| Crew and flight surgeon views, mission profiles, simulated Earth link | |
+| Optional local real-time server (WebSocket) | |
 
 ## Data and resources
 
@@ -89,7 +94,8 @@ VitalOrbit collects health indicators from several sources, turns them into a st
 |---|---|
 | [React](https://react.dev/), [Vite](https://vite.dev/), [TypeScript](https://www.typescriptlang.org/) | Application framework and build tools |
 | [Recharts](https://recharts.org/) | Trend charts |
-| [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) | Planned for the camera safety check. Not used in the prototype |
+| [MediaPipe Pose, Hand, and Face Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) | Body, finger, and face tracking for the camera safety check, run in the browser. The model files are bundled with the app |
+| [Fastify](https://fastify.dev/) and WebSocket | Optional local real-time server for the demo |
 
 ### About the data in this prototype
 
@@ -121,6 +127,8 @@ vitalorbit/
 ├── README.md              Project overview (this file)
 ├── DESIGN.md              Visual and interaction design
 ├── LICENSE
+├── server/                Optional local real-time server (Fastify, WebSocket, SQLite)
+├── scripts/               Build helper that copies the MediaPipe runtime
 ├── docs/
 │   ├── PRD.md             Product requirements
 │   ├── system-design.md   How the system behaves: data flow, rules, alerts
@@ -166,7 +174,11 @@ npm install
 npm run dev
 ```
 
-Open the address shown in the terminal (by default `http://localhost:5173`).
+Open the address shown in the terminal (by default `http://localhost:5173`). The app works on its own, with simulated data and no server.
+
+**Optional real-time server.** In a second terminal, run `npm run server`. The header then shows "Live server: connected", the wearable values stream from the server, and alerts are shared between every open window, for example the astronaut on one device and the flight surgeon on another. Stop the server and the app falls back to its on-device simulator.
+
+**Camera safety check.** The browser asks for camera permission when you press "Start safety camera". Camera access works on `localhost` and on HTTPS pages. Video is processed in the browser and is never stored or sent.
 
 Other commands:
 
@@ -175,6 +187,7 @@ Other commands:
 | `npm run build` | Build the static site into `dist/` |
 | `npm run preview` | Serve the built site locally |
 | `npm run typecheck` | Check TypeScript types |
+| `npm run server` | Start the optional local real-time server on port 8787 |
 | `npm run deploy` | Build and publish `dist/` to the `gh-pages` branch for GitHub Pages |
 
 ## How to try the demo
@@ -186,6 +199,9 @@ Other commands:
 5. Switch to the **Crew** and **Flight surgeon** views to see who else is informed.
 6. Toggle **Earth link** to see how reports are queued on board when there is no connection.
 7. Change the **Mission** to see the communication delay and radiation limit change.
+8. Enter a value in **Log a checkup** (for example systolic pressure 190) and watch the status turn critical.
+9. Press **Start safety camera**, then stay still. After the set time you are asked "Are you OK?". Do not answer, and a red alert reaches the Crew view and the sync queue. Use **Test alert flow** to skip the wait.
+10. Open the **Alert log** to see each alert with its time, delivery state, and acknowledgment. Turn the Earth link on to watch queued reports being sent.
 
 ## License
 

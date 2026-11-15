@@ -2,10 +2,25 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { StatusIcon } from "../../components/StatusIcon";
 import { INDICATOR_BY_ID, REGIONS } from "../../data/rules/indicators";
-import { overallStatus, STATUS_LABEL, worst } from "../../lib/engine";
-import type { Alert, Assessment, CrewMember, IndicatorId, Region, Status } from "../../lib/types";
-import { AlertList } from "../alerts/AlertList";
+import { STATUS_LABEL, worst } from "../../lib/engine";
+import { isHealthIndicator } from "../../lib/types";
+import type {
+  Alert,
+  Assessment,
+  CheckupEntry,
+  CheckupId,
+  CrewMember,
+  IndicatorId,
+  LogEntry,
+  MissionProfile,
+  Region,
+  Status,
+} from "../../lib/types";
+import { AlertList, sourceLabel } from "../alerts/AlertList";
+import { AlertLog } from "../alerts/AlertLog";
+import { CheckupForm } from "../checkup/CheckupForm";
 import { TodayStrip } from "../gamification/TodayStrip";
+import { SyncPanel } from "../sync/SyncPanel";
 import { DetailPanel } from "../guidance/DetailPanel";
 import { IndicatorCard } from "../vitals/IndicatorCard";
 
@@ -15,10 +30,20 @@ const BodyMap3D = lazy(() => import("../body-map/BodyMap3D").then((m) => ({ defa
 interface Props {
   member: CrewMember;
   assessments: Assessment[];
+  /** Includes the camera safety check, so it can be worse than any single indicator. */
+  overall: Status;
   alerts: Alert[];
+  log: LogEntry[];
+  onAck: (id: string) => void;
   linkOn: boolean;
+  profile: MissionProfile;
+  /** Offsets from the local server's wearable stream. Null when the server is not running. */
+  liveVitals: { hr: number; spo2: number } | null;
   moodToday: number | null;
   onMood: (score: number) => void;
+  checkups: CheckupEntry[];
+  onCheckup: (values: Partial<Record<CheckupId, number>>) => void;
+  today: Omit<React.ComponentProps<typeof TodayStrip>, "member" | "moodToday" | "onMood">;
 }
 
 const OVERALL_TEXT: Record<Status, string> = {
@@ -39,8 +64,22 @@ const wideScreen = () => {
   }
 };
 
-export function AstronautView({ member, assessments, alerts, linkOn, moodToday, onMood }: Props) {
-  const overall = overallStatus(assessments);
+export function AstronautView({
+  member,
+  assessments,
+  overall,
+  alerts,
+  log,
+  onAck,
+  linkOn,
+  profile,
+  liveVitals,
+  moodToday,
+  onMood,
+  checkups,
+  onCheckup,
+  today,
+}: Props) {
   const [selected, setSelected] = useState<IndicatorId | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
   const [tick, setTick] = useState(0);
@@ -63,7 +102,7 @@ export function AstronautView({ member, assessments, alerts, linkOn, moodToday, 
   ) as Record<Region, Status>;
 
   // Open the most serious indicator by default, so there is always a next step on screen.
-  const fallback = alerts[0]?.indicator ?? "hr";
+  const fallback = alerts.find((a) => isHealthIndicator(a.indicator))?.indicator as IndicatorId | undefined ?? "hr";
   const current = assessments.find((a) => a.indicator === (selected ?? fallback))!;
   const redAlerts = alerts.filter((a) => a.status === "red");
   const showWarning = redAlerts.length > 0 && !acknowledged;
@@ -90,7 +129,11 @@ export function AstronautView({ member, assessments, alerts, linkOn, moodToday, 
     if (inRegion[0]) setSelected(inRegion[0].indicator);
   };
 
-  const live = (a: Assessment) => (LIVE.includes(a.indicator) ? a.value + ((tick * 7) % 3) - 1 : a.value);
+  const live = (a: Assessment) => {
+    if (!LIVE.includes(a.indicator)) return a.value;
+    if (liveVitals) return Math.min(100, a.value + (a.indicator === "hr" ? liveVitals.hr : liveVitals.spo2));
+    return a.value + ((tick * 7) % 3) - 1;
+  };
   const recent = (id: IndicatorId) => member.history.slice(-14).map((d) => d.values[id]);
 
   return (
@@ -102,11 +145,15 @@ export function AstronautView({ member, assessments, alerts, linkOn, moodToday, 
             <span className="mono">Master warning</span>
           </div>
           <div className="mw-text">
-            <strong>{redAlerts.map((a) => INDICATOR_BY_ID[a.indicator].label).join(" · ")}</strong>
+            <strong>{redAlerts.map((a) => (isHealthIndicator(a.indicator) ? INDICATOR_BY_ID[a.indicator].label : sourceLabel(a.indicator))).join(" · ")}</strong>
             <span>{redAlerts[0].reason} Your crew has been notified.</span>
           </div>
           <div className="mw-actions">
-            <button className="btn btn-line" onClick={() => open(redAlerts[0].indicator)}>
+            <button className="btn btn-line" onClick={() => {
+                const first = redAlerts[0].indicator;
+                if (isHealthIndicator(first)) open(first);
+                else alertsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}>
               See what to do
             </button>
             <button className="btn btn-red" onClick={() => setAcknowledged(true)}>
@@ -221,10 +268,24 @@ export function AstronautView({ member, assessments, alerts, linkOn, moodToday, 
             </h2>
             <span className="label mono">{alerts.length} active</span>
           </header>
-          <AlertList alerts={alerts} linkOn={linkOn} onOpen={open} />
+          <AlertList alerts={alerts} linkOn={linkOn} log={log} onAck={onAck} onOpen={open} />
         </section>
-        <TodayStrip member={member} moodToday={moodToday} onMood={onMood} />
+        <TodayStrip member={member} moodToday={moodToday} onMood={onMood} {...today} />
       </div>
+
+      <div className="grid-even">
+        <CheckupForm entries={checkups} onSubmit={onCheckup} />
+        <SyncPanel log={log} linkOn={linkOn} profile={profile} />
+      </div>
+
+      <section className="block">
+        <header className="block-head">
+          <h2>
+            <span className="idx mono">07</span> Alert log
+          </h2>
+        </header>
+        <AlertLog entries={log.filter((e) => e.crewId === member.id)} linkOn={linkOn} />
+      </section>
     </>
   );
 }

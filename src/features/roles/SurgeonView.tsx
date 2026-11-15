@@ -2,42 +2,33 @@
 import { useState } from "react";
 import { StatusBadge } from "../../components/StatusBadge";
 import { INDICATOR_BY_ID } from "../../data/rules/indicators";
-import { formatValue, overallStatus } from "../../lib/engine";
-import type { Alert, Assessment, CrewMember, IndicatorId, MissionProfile } from "../../lib/types";
-import { AlertList } from "../alerts/AlertList";
+import { formatValue } from "../../lib/engine";
+import type { Assessment, CrewMember, IndicatorId, LogEntry, MissionProfile, Status } from "../../lib/types";
+import { AlertLog } from "../alerts/AlertLog";
 import { DetailPanel } from "../guidance/DetailPanel";
+import { SyncPanel } from "../sync/SyncPanel";
 
 interface Props {
   crew: CrewMember[];
   assessmentsById: Record<string, Assessment[]>;
-  alerts: Alert[];
+  overallById: Record<string, Status>;
+  log: LogEntry[];
   linkOn: boolean;
   profile: MissionProfile;
 }
 
 /** The flight surgeon on Earth sees full history, trends, and the alert log. */
-export function SurgeonView({ crew, assessmentsById, alerts, linkOn, profile }: Props) {
+export function SurgeonView({ crew, assessmentsById, overallById, log, linkOn, profile }: Props) {
   const [crewId, setCrewId] = useState(crew[0].id);
   const [indicator, setIndicator] = useState<IndicatorId>("hr");
   const member = crew.find((m) => m.id === crewId)!;
   const assessments = assessmentsById[crewId];
   const current = assessments.find((a) => a.indicator === indicator)!;
-  const memberAlerts = alerts.filter((a) => a.crewId === crewId);
-  const waiting = alerts.filter((a) => a.status === "red").length;
+  const memberLog = log.filter((e) => e.crewId === crewId);
 
   return (
     <>
-      <section className={`panel sync ${linkOn ? "sync-on" : "sync-off"}`} role="status">
-        <h2>Link to {profile.name}</h2>
-        {linkOn ? (
-          <p>Link is up ({profile.delayLabel}). All reports have been received.</p>
-        ) : (
-          <p>
-            Link is down. {waiting} priority report{waiting === 1 ? "" : "s"} waiting on board. The crew is following
-            on-board guidance. Data below is from the last sync.
-          </p>
-        )}
-      </section>
+      <SyncPanel log={log} linkOn={linkOn} profile={profile} />
 
       <section className="panel">
         <h2>Crew member</h2>
@@ -50,7 +41,7 @@ export function SurgeonView({ crew, assessmentsById, alerts, linkOn, profile }: 
               className={`tab${m.id === crewId ? " tab-active" : ""}`}
               onClick={() => setCrewId(m.id)}
             >
-              {m.name} <StatusBadge status={overallStatus(assessmentsById[m.id])} />
+              {m.name} <StatusBadge status={overallById[m.id]} />
             </button>
           ))}
         </div>
@@ -102,7 +93,7 @@ export function SurgeonView({ crew, assessmentsById, alerts, linkOn, profile }: 
 
       <section className="panel">
         <h2>Alert log: {member.name}</h2>
-        <AlertList alerts={memberAlerts} linkOn={linkOn} />
+        <AlertLog entries={memberLog} linkOn={linkOn} />
       </section>
     </>
   );

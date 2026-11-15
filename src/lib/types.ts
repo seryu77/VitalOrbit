@@ -75,14 +75,35 @@ export interface Assessment {
   bands: Bands;
 }
 
+/** What raised an alert: a health indicator, the camera safety check, or the spine posture check. */
+export type AlertSource = IndicatorId | "vision" | "spine";
+
+export const isHealthIndicator = (s: AlertSource): s is IndicatorId => s !== "vision" && s !== "spine";
+
 export interface Alert {
   id: string;
   crewId: string;
   crewName: string;
-  indicator: IndicatorId;
+  indicator: AlertSource;
   status: Status;
   reason: string;
   day: number;
 }
 
 export type ScenarioId = "nominal" | "fever" | "sleep" | "cardiac" | "isolation" | "storm";
+
+/** An alert as kept in the on-device log, with its time, acknowledgment, and delivery to the flight surgeon. */
+export interface LogEntry extends Alert {
+  at: number;
+  ackAt: number | null;
+  /** Red alerts only: when the report reached the flight surgeon. Null while it waits in the queue. */
+  sentAt: number | null;
+}
+
+export type CheckupId = "bp" | "mass" | "glucose";
+
+export interface CheckupEntry {
+  id: string;
+  at: number;
+  values: Partial<Record<CheckupId, number>>;
+}
